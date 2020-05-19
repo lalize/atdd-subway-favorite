@@ -1,12 +1,14 @@
 package wooteco.subway.acceptance.member;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import wooteco.subway.AcceptanceTest;
 import wooteco.subway.service.member.dto.MemberResponse;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@Disabled
 public class MemberAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("회원 관리 기능")

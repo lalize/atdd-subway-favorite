@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import wooteco.subway.domain.member.Member;
 import wooteco.subway.service.member.dto.MemberResponse;
 import wooteco.subway.service.member.dto.TokenResponse;
 
@@ -13,7 +14,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 public class AuthAcceptanceTest extends AcceptanceTest {
     @DisplayName("Basic Auth")
     @Test
@@ -57,8 +57,23 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     }
 
     public MemberResponse myInfoWithSession(String email, String password) {
-        // TODO: form auth를 활용하여 /me/session 요청하여 내 정보 조회
-        return null;
+        String sessionId = given().
+                formParam("email", email).
+                formParam("password", password).
+                contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).
+        when().
+                post("/login")
+                .andReturn()
+                .sessionId();
+
+        return given().
+                    sessionId(sessionId).
+                when()
+                    .get("/me/session").
+                then().
+                    log().all().
+                    statusCode(HttpStatus.OK.value()).
+                    extract().as(MemberResponse.class);
     }
 
     public MemberResponse myInfoWithBearerAuth(TokenResponse tokenResponse) {

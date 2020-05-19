@@ -2,6 +2,7 @@ package wooteco.subway;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.restassured.authentication.FormAuthConfig;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
@@ -63,16 +64,10 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     }
 
     public MemberResponse myInfoWithSession(String email, String password) {
-        String sessionId = given().
-                formParam("email", email).
-                formParam("password", password).
-                contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).
-        when().
-                post("/login").
-                andReturn().sessionId();
-
         return given().
-                    sessionId(sessionId).
+                    auth().
+                    form(email, password, new FormAuthConfig("/login", "email", "password")).
+                    contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).
                 when().
                     get("/me/session").
                 then().

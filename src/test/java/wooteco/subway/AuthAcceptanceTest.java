@@ -1,18 +1,15 @@
 package wooteco.subway;
 
-import org.junit.jupiter.api.Disabled;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import wooteco.subway.domain.member.Member;
 import wooteco.subway.service.member.dto.MemberResponse;
 import wooteco.subway.service.member.dto.TokenResponse;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AuthAcceptanceTest extends AcceptanceTest {
     @DisplayName("Basic Auth")
@@ -52,8 +49,17 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     }
 
     public MemberResponse myInfoWithBasicAuth(String email, String password) {
-        // TODO: basic auth를 활용하여 /me/basic 요청하여 내 정보 조회
-        return null;
+        return given().
+                    auth().
+                    preemptive().
+                    basic(email, password).
+                when().
+                    get("/me/basic").
+                then().
+                    log().all().
+                    statusCode(HttpStatus.OK.value()).
+                    extract().as(MemberResponse.class);
+
     }
 
     public MemberResponse myInfoWithSession(String email, String password) {
@@ -62,14 +68,13 @@ public class AuthAcceptanceTest extends AcceptanceTest {
                 formParam("password", password).
                 contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).
         when().
-                post("/login")
-                .andReturn()
-                .sessionId();
+                post("/login").
+                andReturn().sessionId();
 
         return given().
                     sessionId(sessionId).
-                when()
-                    .get("/me/session").
+                when().
+                    get("/me/session").
                 then().
                     log().all().
                     statusCode(HttpStatus.OK.value()).
